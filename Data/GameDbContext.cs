@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RumblingFishBackend.Models;
+using RumblingFishBackend.Data.Seed;
 
 namespace RumblingFishBackend.Data
 {
@@ -41,6 +42,8 @@ namespace RumblingFishBackend.Data
             modelBuilder.Entity<PlayerLevelStatistics>()
                 .HasIndex(x => new { x.UserId, x.LevelId })
                 .IsUnique();
+
+            LevelSeed.Seed(modelBuilder);
         }
     }
 }
