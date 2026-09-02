@@ -1,7 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using RumblingFishBackend.Data;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
+using RumblingFishBackend.Authentication;
+using RumblingFishBackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,10 @@ FirebaseApp.Create(new AppOptions
 });
 
 // Add services to the container.
+
+builder.Services
+    .AddAuthentication("Firebase")
+    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase",options => { });
 
 builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseNpgsql(
@@ -35,6 +41,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
