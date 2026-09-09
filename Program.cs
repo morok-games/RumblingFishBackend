@@ -4,8 +4,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using RumblingFishBackend.Authentication;
 using RumblingFishBackend.Data;
+using RumblingFishBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<UserService>();
 
 //Firebase
 var firebaseCredentialsPath = builder.Configuration["Firebase:CredentialsPath"];
@@ -22,6 +25,8 @@ FirebaseApp.Create(new AppOptions
 builder.Services
     .AddAuthentication("Firebase")
     .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase",options => { });
+
+builder.Services.AddHttpClient<FirebaseSaveService>();
 
 builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseNpgsql(

@@ -21,14 +21,18 @@ namespace RumblingFishBackend.Data
                 .HasIndex(x => x.FirebaseUid)
                 .IsUnique();
 
+            modelBuilder.Entity<User>()
+                .HasIndex(x => x.Nickname)
+                .IsUnique();
+
             modelBuilder.Entity<PlayerStatistics>()
-                .HasOne<User>()
+                .HasOne(x => x.User)
                 .WithOne()
                 .HasForeignKey<PlayerStatistics>(x => x.UserId)
                 .IsRequired();
 
             modelBuilder.Entity<PlayerLevelStatistics>()
-                .HasOne<User>()
+                .HasOne(x => x.User)
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
                 .IsRequired();

@@ -6,6 +6,8 @@
 
         public int UserId { get; set; }
 
+        public User User { get; set; } = null!;
+
         public int LevelId { get; set; }
 
         public int Deaths { get; set; }

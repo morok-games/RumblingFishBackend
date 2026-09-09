@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RumblingFishBackend.Data;
@@ -11,9 +12,11 @@ using RumblingFishBackend.Data;
 namespace RumblingFishBackend.Migrations
 {
     [DbContext(typeof(GameDbContext))]
-    partial class GameDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260908124424_AddUserProfileFields")]
+    partial class AddUserProfileFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -161,6 +164,10 @@ namespace RumblingFishBackend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("FirebaseUid")
                         .IsRequired()
                         .HasColumnType("text");
@@ -171,15 +178,9 @@ namespace RumblingFishBackend.Migrations
                     b.Property<DateTime>("LastLoginAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Nickname")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("FirebaseUid")
-                        .IsUnique();
-
-                    b.HasIndex("Nickname")
                         .IsUnique();
 
                     b.ToTable("Users");
