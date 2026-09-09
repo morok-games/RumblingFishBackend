@@ -11,6 +11,7 @@ namespace RumblingFishBackend.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Player> Players { get; set; }
         public DbSet<Level> Levels { get; set; }
         public DbSet<PlayerStatistics> PlayerStatistics { get; set; }
         public DbSet<PlayerLevelStatistics> PlayerLevelStatistics { get; set; }
@@ -21,20 +22,26 @@ namespace RumblingFishBackend.Data
                 .HasIndex(x => x.FirebaseUid)
                 .IsUnique();
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<Player>()
+                .HasOne(x => x.User)
+                .WithOne()
+                .HasForeignKey<Player>(x => x.UserId)
+                .IsRequired();
+
+            modelBuilder.Entity<Player>()
                 .HasIndex(x => x.Nickname)
                 .IsUnique();
 
             modelBuilder.Entity<PlayerStatistics>()
-                .HasOne(x => x.User)
+                .HasOne(x => x.Player)
                 .WithOne()
-                .HasForeignKey<PlayerStatistics>(x => x.UserId)
+                .HasForeignKey<PlayerStatistics>(x => x.PlayerId)
                 .IsRequired();
 
             modelBuilder.Entity<PlayerLevelStatistics>()
-                .HasOne(x => x.User)
+                .HasOne(x => x.Player)
                 .WithMany()
-                .HasForeignKey(x => x.UserId)
+                .HasForeignKey(x => x.PlayerId)
                 .IsRequired();
 
             modelBuilder.Entity<PlayerLevelStatistics>()
@@ -44,7 +51,7 @@ namespace RumblingFishBackend.Data
                 .IsRequired();
 
             modelBuilder.Entity<PlayerLevelStatistics>()
-                .HasIndex(x => new { x.UserId, x.LevelId })
+                .HasIndex(x => new { x.PlayerId, x.LevelId })
                 .IsUnique();
 
             LevelSeed.Seed(modelBuilder);

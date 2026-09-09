@@ -62,7 +62,6 @@ namespace RumblingFishBackend.Services
                 {
                     FirebaseUid = firebaseUid,
                     LastIpAddress = ipAddress,
-                    CountryCode = countryCode,
                     CreatedAt = now,
                     LastLoginAt = now
                 };
@@ -70,12 +69,18 @@ namespace RumblingFishBackend.Services
                 _db.Users.Add(user);
                 await _db.SaveChangesAsync();
 
-                user.Nickname = $"Player{user.Id}";
+                //Create Player
+                var player = new Player
+                {
+                    User = user,
+                    Nickname = $"Player{user.Id}",
+                    CountryCode = countryCode
+                };
 
                 // Create PlayerStatistics
                 var playerStatistics = new PlayerStatistics
                 {
-                    User = user,
+                    Player = player,
                     Experience = saveData?.gameStatistics?.Experience ?? 0,
                     CoinsCollected = saveData?.gameStatistics?.CoinsCollected ?? 0
                 };
@@ -97,7 +102,7 @@ namespace RumblingFishBackend.Services
 
                         _db.PlayerLevelStatistics.Add(new PlayerLevelStatistics
                         {
-                            User = user,
+                            Player = player,
                             LevelId = levelId,
                             Deaths = 0,
                             Attempts = 1,

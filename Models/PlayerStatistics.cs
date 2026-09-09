@@ -4,9 +4,9 @@
     {
         public int Id { get; set; }
 
-        public int UserId { get; set; }
+        public int PlayerId { get; set; }
 
-        public User User { get; set; } = null!;
+        public Player Player { get; set; } = null!;
 
         public int Experience { get; set; }
 
