@@ -8,11 +8,13 @@ namespace RumblingFishBackend.Services
     {
         private readonly GameDbContext _db;
         private readonly FirebaseSaveService _firebaseSaveService;
+        private readonly GeoIpService _geoIpService;
 
-        public UserService(GameDbContext db, FirebaseSaveService firebaseSaveService)
+        public UserService(GameDbContext db, FirebaseSaveService firebaseSaveService, GeoIpService geoIpService)
         {
             _db = db;
             _firebaseSaveService = firebaseSaveService;
+            _geoIpService = geoIpService;
         }
 
         public async Task<User> GetOrCreateUserAsync(string firebaseUid, string? ipAddress)
@@ -35,6 +37,7 @@ namespace RumblingFishBackend.Services
 
             //Read the old saved state BEFORE starting the database transaction
             var saveData = await _firebaseSaveService.GetSaveDataAsync(firebaseUid);
+            var countryCode = await _geoIpService.GetCountryCodeAsync(ipAddress);
 
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
@@ -59,6 +62,7 @@ namespace RumblingFishBackend.Services
                 {
                     FirebaseUid = firebaseUid,
                     LastIpAddress = ipAddress,
+                    CountryCode = countryCode,
                     CreatedAt = now,
                     LastLoginAt = now
                 };

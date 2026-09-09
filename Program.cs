@@ -9,6 +9,7 @@ using RumblingFishBackend.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddHttpClient<GeoIpService>();
 
 //Firebase
 var firebaseCredentialsPath = builder.Configuration["Firebase:CredentialsPath"];
