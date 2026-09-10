@@ -10,10 +10,12 @@ namespace RumblingFishBackend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly PlayerService _playerService;
 
-        public AuthController(UserService userService)
+        public AuthController(UserService userService, PlayerService playerService)
         {
             _userService = userService;
+            _playerService = playerService;
         }
 
         [Authorize]
@@ -29,10 +31,11 @@ namespace RumblingFishBackend.Controllers
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var user = await _userService.GetOrCreateUserAsync(firebaseUid, ipAddress);
+            var nickname = await _playerService.GetNicknameAsync(firebaseUid);
 
             return Ok(new
             {
-                userId = user.Id
+                nickname = nickname
             });
         }
     }

@@ -9,6 +9,7 @@ using RumblingFishBackend.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PlayerService>();
 builder.Services.AddHttpClient<GeoIpService>();
 
 //Firebase
