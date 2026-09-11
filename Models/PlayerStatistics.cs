@@ -10,6 +10,8 @@
 
         public int Experience { get; set; }
 
+        public int LevelsScore { get; set; }
+
         public int CoinsCollected { get; set; }
     }
 }

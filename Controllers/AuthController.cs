@@ -33,9 +33,14 @@ namespace RumblingFishBackend.Controllers
             var user = await _userService.GetOrCreateUserAsync(firebaseUid, ipAddress);
             var player = await _playerService.GetPlayerAsync(firebaseUid);
 
+            if (player == null)
+            {
+                return Problem();
+            }
+
             return Ok(new
             {
-                nickname = player?.Nickname
+                nickname = player.Nickname
             });
         }
     }

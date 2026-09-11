@@ -6,15 +6,18 @@ namespace RumblingFishBackend.Services
 {
     public class UserService
     {
+        private const int maxLevelRating = 3;
         private readonly GameDbContext _db;
         private readonly FirebaseSaveService _firebaseSaveService;
         private readonly GeoIpService _geoIpService;
+        private readonly PlayerService _playerService;
 
-        public UserService(GameDbContext db, FirebaseSaveService firebaseSaveService, GeoIpService geoIpService)
+        public UserService(GameDbContext db, FirebaseSaveService firebaseSaveService, GeoIpService geoIpService, PlayerService playerService)
         {
             _db = db;
             _firebaseSaveService = firebaseSaveService;
             _geoIpService = geoIpService;
+            _playerService = playerService;
         }
 
         public async Task<User> GetOrCreateUserAsync(string firebaseUid, string? ipAddress)
@@ -107,12 +110,14 @@ namespace RumblingFishBackend.Services
                             Deaths = 0,
                             Attempts = 1,
                             PlayTime = 0,
+                            Rating = maxLevelRating,
                             Completed = true
                         });
                     }
                 }
 
                 await _db.SaveChangesAsync();
+                await _playerService.UpdateLevelsScoreAsync(player);
 
                 await transaction.CommitAsync();
 

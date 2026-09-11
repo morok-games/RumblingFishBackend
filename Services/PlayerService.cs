@@ -110,12 +110,30 @@ namespace RumblingFishBackend.Services
                 }
 
                 await _db.SaveChangesAsync();
+                await UpdateLevelsScoreAsync(player);
+
                 return SetPlayerStatisticResult.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to save level statistic for player");
                 return SetPlayerStatisticResult.Error;
+            }
+        }
+        
+        public async Task UpdateLevelsScoreAsync(Models.Player player)
+        {
+            var levelsScore = await _db.PlayerLevelStatistics
+                .Where(x => x.Player == player && x.Completed)
+                .SumAsync(x => x.Level.Reward * x.Rating);
+
+            var playerStatistics = await _db.PlayerStatistics
+                .FirstOrDefaultAsync(x => x.Player == player);
+
+            if (playerStatistics != null)
+            {
+                playerStatistics.LevelsScore = levelsScore;
+                await _db.SaveChangesAsync();
             }
         }
     }
