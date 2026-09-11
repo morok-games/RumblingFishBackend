@@ -28,11 +28,11 @@ namespace RumblingFishBackend.Controllers
                 return Unauthorized();
             }
 
-            var nickname = await _playerService.GetNicknameAsync(firebaseUid);
+            var player = await _playerService.GetPlayerAsync(firebaseUid);
 
             return Ok(new 
             { 
-                nickname = nickname 
+                nickname = player?.Nickname ?? string.Empty,
             });
         }
 

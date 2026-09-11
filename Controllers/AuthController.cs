@@ -31,11 +31,11 @@ namespace RumblingFishBackend.Controllers
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var user = await _userService.GetOrCreateUserAsync(firebaseUid, ipAddress);
-            var nickname = await _playerService.GetNicknameAsync(firebaseUid);
+            var player = await _playerService.GetPlayerAsync(firebaseUid);
 
             return Ok(new
             {
-                nickname = nickname
+                nickname = player?.Nickname
             });
         }
     }

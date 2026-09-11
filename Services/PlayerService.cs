@@ -1,23 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using RumblingFishBackend.Data;
+using RumblingFishBackend.Models.Requests;
 
 namespace RumblingFishBackend.Services
 {
     public class PlayerService
     {
         private readonly GameDbContext _db;
+        private readonly ILogger<PlayerService> _logger;    
 
-        public PlayerService(GameDbContext db)
+        public PlayerService(GameDbContext db, ILogger<PlayerService> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
-        public async Task<string?> GetNicknameAsync(string firebaseUid)
+        public async Task<Models.Player?> GetPlayerAsync(string firebaseUid)
         {
             var player = await _db.Players.FirstOrDefaultAsync(p => p.User.FirebaseUid == firebaseUid);
 
-            return player?.Nickname;
+            return player;
         }
 
         public async Task<SetNicknameResult> TrySetNicknameAsync(string firebaseUid, string nickname)
@@ -41,7 +44,82 @@ namespace RumblingFishBackend.Services
                 return SetNicknameResult.NicknameTaken;
             }
         }
+
+        public async Task<SetPlayerStatisticResult> TryAddPlayerStatistic(string firebaseUid, int levelId, LevelResultRequest request)
+        {
+            var player = await _db.Players.FirstOrDefaultAsync(p => p.User.FirebaseUid == firebaseUid);
+
+            if (player == null)
+            {
+                return SetPlayerStatisticResult.PlayerNotFound;
+            }
+
+            var level = await _db.Levels.FirstOrDefaultAsync(l=>l.Id == levelId);
+
+            if(level == null)
+            {
+                return SetPlayerStatisticResult.InvalidLevel;
+            }
+
+            try
+            {
+
+                var playerStatistics = await _db.PlayerStatistics.FirstOrDefaultAsync(p => p.Player == player);
+
+                if (playerStatistics == null)
+                {
+                    playerStatistics = new Models.PlayerStatistics
+                    {
+                        Player = player,
+                        Experience = request.Experience,
+                        CoinsCollected = request.CoinsCollected
+                    };
+
+                    _db.PlayerStatistics.Add(playerStatistics);
+                }
+                else
+                {
+                    playerStatistics.Experience += request.Experience;
+                    playerStatistics.CoinsCollected += request.CoinsCollected;
+                }
+
+                var playerLevelStatistics = await _db.PlayerLevelStatistics.FirstOrDefaultAsync(p => p.Player == player && p.Level == level);
+
+                if (playerLevelStatistics == null)
+                {
+                    playerLevelStatistics = new Models.PlayerLevelStatistics
+                    {
+                        Player = player,
+                        Level = level,
+                        Deaths = request.Deaths,
+                        Attempts = 1,
+                        PlayTime = request.PlayTime,
+                        Rating = request.Rating,
+                        Completed = request.Completed
+                    };
+
+                    _db.PlayerLevelStatistics.Add(playerLevelStatistics);
+                }
+                else
+                {
+                    playerLevelStatistics.Deaths += request.Deaths;
+                    playerLevelStatistics.Attempts++;
+                    playerLevelStatistics.PlayTime += request.PlayTime;
+                    playerLevelStatistics.Rating = Math.Max(playerLevelStatistics.Rating,request.Rating);
+                    playerLevelStatistics.Completed = playerLevelStatistics.Completed ? true : request.Completed;
+                }
+
+                await _db.SaveChangesAsync();
+                return SetPlayerStatisticResult.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to save level statistic for player");
+                return SetPlayerStatisticResult.Error;
+            }
+        }
     }
 
     public enum SetNicknameResult { Success, NicknameTaken, PlayerNotFound }
+    public enum SetPlayerStatisticResult { Success, Error, InvalidLevel, PlayerNotFound }
 }

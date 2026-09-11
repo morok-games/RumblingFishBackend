@@ -10,11 +10,15 @@
 
         public int LevelId { get; set; }
 
+        public Level Level { get; set; } = null!;
+
         public int Deaths { get; set; }
 
         public int Attempts { get; set; }
 
         public int PlayTime { get; set; }
+
+        public int Rating { get; set; }
 
         public bool Completed { get; set; }
     }

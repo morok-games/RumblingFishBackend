@@ -45,7 +45,7 @@ namespace RumblingFishBackend.Data
                 .IsRequired();
 
             modelBuilder.Entity<PlayerLevelStatistics>()
-                .HasOne<Level>()
+                .HasOne(x => x.Level)
                 .WithMany()
                 .HasForeignKey(x => x.LevelId)
                 .IsRequired();
