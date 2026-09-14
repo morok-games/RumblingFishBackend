@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using RumblingFishBackend.Data;
-using RumblingFishBackend.Models.Requests;
+using RumblingFishBackend.Models;
+using RumblingFishBackend.Models.DTO.Level;
 
 namespace RumblingFishBackend.Services
 {
@@ -19,6 +20,59 @@ namespace RumblingFishBackend.Services
         public async Task<Models.Player?> GetPlayerAsync(string firebaseUid)
         {
             var player = await _db.Players.FirstOrDefaultAsync(p => p.User.FirebaseUid == firebaseUid);
+
+            return player;
+        }
+
+        public async Task<Player> CreatePlayerAsync(
+            User user,string? countryCode,int initialExperience,int initialCoins,IEnumerable<int>? completedLevelIds)
+        {
+            //Create Player
+            var player = new Player
+            {
+                User = user,
+                Nickname = $"Player{user.Id}",
+                CountryCode = countryCode
+            };
+
+            // Create PlayerStatistics
+            var playerStatistics = new PlayerStatistics
+            {
+                Player = player,
+                Experience = initialExperience,
+                CoinsCollected = initialCoins
+            };
+
+            _db.PlayerStatistics.Add(playerStatistics);
+
+            // Create PlayerLevelStatistics
+
+            var levelIds = await _db.Levels.Select(x => x.Id).ToHashSetAsync();
+
+            if (completedLevelIds != null)
+            {
+                foreach (var levelId in completedLevelIds.Distinct())
+                {
+                    if (!levelIds.Contains(levelId))
+                    {
+                        continue;
+                    }
+
+                    _db.PlayerLevelStatistics.Add(new PlayerLevelStatistics
+                    {
+                        Player = player,
+                        LevelId = levelId,
+                        Deaths = 0,
+                        Attempts = 1,
+                        PlayTime = 0,
+                        Rating = Level.MaxLevelRating,
+                        Completed = true
+                    });
+                }
+            }
+
+            await _db.SaveChangesAsync();
+            await UpdateLevelsScoreAsync(player);
 
             return player;
         }
@@ -60,6 +114,8 @@ namespace RumblingFishBackend.Services
             {
                 return SetPlayerStatisticResult.InvalidLevel;
             }
+
+            await using var transaction = await _db.Database.BeginTransactionAsync();
 
             try
             {
@@ -112,16 +168,19 @@ namespace RumblingFishBackend.Services
                 await _db.SaveChangesAsync();
                 await UpdateLevelsScoreAsync(player);
 
+                await transaction.CommitAsync();
+
                 return SetPlayerStatisticResult.Success;
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 _logger.LogError(ex, "Failed to save level statistic for player");
                 return SetPlayerStatisticResult.Error;
             }
         }
         
-        public async Task UpdateLevelsScoreAsync(Models.Player player)
+        private async Task UpdateLevelsScoreAsync(Models.Player player)
         {
             var levelsScore = await _db.PlayerLevelStatistics
                 .Where(x => x.Player == player && x.Completed)

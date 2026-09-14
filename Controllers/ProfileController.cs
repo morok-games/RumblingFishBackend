@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using RumblingFishBackend.Models.Requests;
+﻿using Microsoft.AspNetCore.Mvc;
+using RumblingFishBackend.Controllers.Base;
+using RumblingFishBackend.Models.DTO.Profile;
 using RumblingFishBackend.Services;
-using System.Security.Claims;
 
 namespace RumblingFishBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProfileController : ControllerBase
+    public class ProfileController : AuthorizedApiController
     {
         private readonly PlayerService _playerService;
 
@@ -17,42 +16,23 @@ namespace RumblingFishBackend.Controllers
             _playerService = playerService;
         }
 
-        [Authorize]
         [HttpGet("nickname")]
         public async Task<IActionResult> GetNickname()
         {
-            var firebaseUid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var player = await _playerService.GetPlayerAsync(FirebaseUid);
 
-            if (firebaseUid == null)
+            if (player == null || player.Nickname == null)
             {
-                return Unauthorized();
+                return NotFound();
             }
 
-            var player = await _playerService.GetPlayerAsync(firebaseUid);
-
-            return Ok(new 
-            { 
-                nickname = player?.Nickname ?? string.Empty,
-            });
+            return Ok(new NicknameResponse(player.Nickname));
         }
 
-        [Authorize]
-        [HttpPost("nickname")]
+        [HttpPut("nickname")]
         public async Task<IActionResult> SetNickname([FromBody] SetNicknameRequest request)
         {
-            var firebaseUid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (firebaseUid == null)
-            {
-                return Unauthorized();
-            }
-
-            if (string.IsNullOrWhiteSpace(request.Nickname) || request.Nickname.Length < 3 || request.Nickname.Length > 15)
-            {
-                return BadRequest();
-            }
-
-            var result = await _playerService.TrySetNicknameAsync(firebaseUid, request.Nickname);
+            var result = await _playerService.TrySetNicknameAsync(FirebaseUid, request.Nickname);
 
             return result switch
             {

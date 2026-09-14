@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RumblingFishBackend.Data;
 using System.Linq.Expressions;
+using RumblingFishBackend.Models.DTO.Leaderboard;
 
 namespace RumblingFishBackend.Services
 {
@@ -102,12 +103,5 @@ namespace RumblingFishBackend.Services
         }
 
         private record LeaderboardRow(int PlayerId, string? Nickname, string? CountryCode, int Score);
-        public record LeaderboardEntry(int Rank, string Nickname, string? CountryCode, int Score);
-
-        public record LeaderboardResponse(
-            List<LeaderboardEntry> Top,
-            List<LeaderboardEntry> Before,
-            LeaderboardEntry Me,
-            List<LeaderboardEntry> After);
     }
 }

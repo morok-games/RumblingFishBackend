@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using RumblingFishBackend.Models.Requests;
+﻿using Microsoft.AspNetCore.Mvc;
+using RumblingFishBackend.Controllers.Base;
+using RumblingFishBackend.Models.DTO.Level;
 using RumblingFishBackend.Services;
-using System.Security.Claims;
 
 namespace RumblingFishBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LevelController : ControllerBase
+    public class LevelController : AuthorizedApiController
     {
         private readonly PlayerService _playerService;
 
@@ -17,18 +16,10 @@ namespace RumblingFishBackend.Controllers
             _playerService = playerService;
         }
 
-        [Authorize]
         [HttpPost("{levelId}/result")]
         public async Task<IActionResult> Result([FromRoute] int levelId, [FromBody] LevelResultRequest request)
         {
-            var firebaseUid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (firebaseUid == null)
-            {
-                return Unauthorized();
-            }
-
-            var result = await _playerService.TryAddPlayerStatistic(firebaseUid, levelId, request);
+            var result = await _playerService.TryAddPlayerStatistic(FirebaseUid, levelId, request);
 
             return result switch
             {

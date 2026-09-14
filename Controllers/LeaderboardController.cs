@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using RumblingFishBackend.Controllers.Base;
 using RumblingFishBackend.Services;
-using System.Security.Claims;
 
 namespace RumblingFishBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LeaderboardController : ControllerBase
+    public class LeaderboardController : AuthorizedApiController
     {
         private const int amountOfFirstPlayers = 10;
         private const int amountBeforePlayer = 3;
@@ -22,18 +20,10 @@ namespace RumblingFishBackend.Controllers
             _leaderboardService = leaderboardService;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetLeaderboard() 
         {
-            var firebaseUid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (firebaseUid == null)
-            {
-                return Unauthorized();
-            }
-
-            var player = await _playerService.GetPlayerAsync(firebaseUid);
+            var player = await _playerService.GetPlayerAsync(FirebaseUid);
 
             if (player == null) 
             {

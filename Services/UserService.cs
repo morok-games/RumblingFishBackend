@@ -6,7 +6,6 @@ namespace RumblingFishBackend.Services
 {
     public class UserService
     {
-        private const int maxLevelRating = 3;
         private readonly GameDbContext _db;
         private readonly FirebaseSaveService _firebaseSaveService;
         private readonly GeoIpService _geoIpService;
@@ -72,52 +71,12 @@ namespace RumblingFishBackend.Services
                 _db.Users.Add(user);
                 await _db.SaveChangesAsync();
 
-                //Create Player
-                var player = new Player
-                {
-                    User = user,
-                    Nickname = $"Player{user.Id}",
-                    CountryCode = countryCode
-                };
-
-                // Create PlayerStatistics
-                var playerStatistics = new PlayerStatistics
-                {
-                    Player = player,
-                    Experience = saveData?.gameStatistics?.Experience ?? 0,
-                    CoinsCollected = saveData?.gameStatistics?.CoinsCollected ?? 0
-                };
-
-                _db.PlayerStatistics.Add(playerStatistics);
-
-                // Create PlayerLevelStatistics
-
-                var levelIds = await _db.Levels.Select(x => x.Id).ToHashSetAsync();
-
-                if (saveData?.completedLevels != null)
-                {
-                    foreach (var levelId in saveData.completedLevels.Distinct())
-                    {
-                        if (!levelIds.Contains(levelId))
-                        {
-                            continue;
-                        }
-
-                        _db.PlayerLevelStatistics.Add(new PlayerLevelStatistics
-                        {
-                            Player = player,
-                            LevelId = levelId,
-                            Deaths = 0,
-                            Attempts = 1,
-                            PlayTime = 0,
-                            Rating = maxLevelRating,
-                            Completed = true
-                        });
-                    }
-                }
-
-                await _db.SaveChangesAsync();
-                await _playerService.UpdateLevelsScoreAsync(player);
+                await _playerService.CreatePlayerAsync(
+                    user,
+                    countryCode,
+                    saveData?.gameStatistics?.Experience ?? 0,
+                    saveData?.gameStatistics?.CoinsCollected ?? 0,
+                    saveData?.completedLevels);
 
                 await transaction.CommitAsync();
 

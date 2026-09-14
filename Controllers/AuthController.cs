@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using RumblingFishBackend.Controllers.Base;
+using RumblingFishBackend.Models.DTO.Auth;
 using RumblingFishBackend.Services;
-using System.Security.Claims;
 
 namespace RumblingFishBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : AuthorizedApiController
     {
         private readonly UserService _userService;
         private readonly PlayerService _playerService;
@@ -18,30 +18,19 @@ namespace RumblingFishBackend.Controllers
             _playerService = playerService;
         }
 
-        [Authorize]
         [HttpPost("login")]
         public async Task<IActionResult> Login()
         {
-            var firebaseUid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (firebaseUid == null)
-            {
-                return Unauthorized();
-            }
-
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-            var user = await _userService.GetOrCreateUserAsync(firebaseUid, ipAddress);
-            var player = await _playerService.GetPlayerAsync(firebaseUid);
+            var user = await _userService.GetOrCreateUserAsync(FirebaseUid, ipAddress);
+            var player = await _playerService.GetPlayerAsync(FirebaseUid);
 
-            if (player == null)
+            if (player == null || player.Nickname == null)
             {
                 return Problem();
             }
 
-            return Ok(new
-            {
-                nickname = player.Nickname
-            });
+            return Ok(new LoginResponse(player.Nickname));
         }
     }
 }
