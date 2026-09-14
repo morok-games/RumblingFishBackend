@@ -33,9 +33,9 @@ builder.Services
 
 //Services custom
 builder.Services.AddHttpClient<FirebaseSaveService>();
+builder.Services.AddHttpClient<GeoIpService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PlayerService>();
-builder.Services.AddHttpClient<GeoIpService>();
 builder.Services.AddScoped<LeaderboardService>();
 
 // DB
@@ -43,6 +43,7 @@ builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
