@@ -8,10 +8,12 @@
 
         public Player Player { get; set; } = null!;
 
+        public int CoinsCollected { get; set; }
+
         public int Experience { get; set; }
 
         public int LevelsScore { get; set; }
+        public int Score { get; set; }
 
-        public int CoinsCollected { get; set; }
     }
 }

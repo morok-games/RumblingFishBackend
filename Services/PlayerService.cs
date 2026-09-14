@@ -133,6 +133,7 @@ namespace RumblingFishBackend.Services
             if (playerStatistics != null)
             {
                 playerStatistics.LevelsScore = levelsScore;
+                playerStatistics.Score = playerStatistics.Experience + levelsScore;
                 await _db.SaveChangesAsync();
             }
         }

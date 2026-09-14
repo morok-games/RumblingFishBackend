@@ -36,6 +36,7 @@ builder.Services.AddHttpClient<FirebaseSaveService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PlayerService>();
 builder.Services.AddHttpClient<GeoIpService>();
+builder.Services.AddScoped<LeaderboardService>();
 
 // DB
 builder.Services.AddDbContext<GameDbContext>(options =>

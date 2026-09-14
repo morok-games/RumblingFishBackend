@@ -38,6 +38,9 @@ namespace RumblingFishBackend.Data
                 .HasForeignKey<PlayerStatistics>(x => x.PlayerId)
                 .IsRequired();
 
+            modelBuilder.Entity<PlayerStatistics>()
+                .HasIndex(x => new { x.Score, x.PlayerId });
+
             modelBuilder.Entity<PlayerLevelStatistics>()
                 .HasOne(x => x.Player)
                 .WithMany()
