@@ -33,11 +33,19 @@ FirebaseApp.Create(new AppOptions
         .ToGoogleCredential()
 });
 
+//Authentication
 builder.Services
     .AddAuthentication("Firebase")
-    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", options => { });
+    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", options => { })
+    .AddCookie("AdminCookie", options =>
+    {
+        options.LoginPath = "/admin/login";
+        options.AccessDeniedPath = "/admin/login";
+    });
 
 //Services custom
+builder.Services.AddScoped<AdminAccountService>();
+
 builder.Services.AddHttpClient<FirebaseSaveService>();
 builder.Services.AddHttpClient<GeoIpService>();
 builder.Services.AddScoped<UserService>();
