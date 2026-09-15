@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RumblingFishBackend.Services;
 using System.Security.Claims;
@@ -17,8 +18,15 @@ namespace RumblingFishBackend.Controllers.Admin
         }
 
         [HttpGet]
-        public IActionResult Index(string? returnUrl)
+        public async Task<IActionResult> Index(string? returnUrl)
         {
+            var result = await HttpContext.AuthenticateAsync("AdminCookie");
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("index", "home");
+            }
+
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -45,7 +53,16 @@ namespace RumblingFishBackend.Controllers.Admin
                 return Redirect(returnUrl);
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("index", "home");
+        }
+
+        [HttpPost("/admin/logout")]
+        [ValidateAntiForgeryToken]
+        [Authorize(AuthenticationSchemes = "AdminCookie")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("AdminCookie");
+            return RedirectToAction("index");
         }
     }
 }

@@ -6,5 +6,11 @@
 </head>
 <body>
     @RenderBody()
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <form asp-controller="Login" asp-action="Logout" method="post">
+            <button type="submit">Log out</button>
+        </form>
+    }
 </body>
 </html>
