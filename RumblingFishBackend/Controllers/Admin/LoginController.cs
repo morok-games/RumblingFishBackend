@@ -32,6 +32,7 @@ namespace RumblingFishBackend.Controllers.Admin
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(LoginViewModel model, string? returnUrl)
         {
             var account = await _adminAccountService.ValidateCredentialsAsync(model.Username, model.Password);

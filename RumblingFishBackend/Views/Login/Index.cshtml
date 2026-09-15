@@ -7,7 +7,7 @@
 
 <h1>Admin Login</h1>
 
-<form method="post">
+<form asp-controller="Login" asp-action="Index" method="post">
     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
     <div asp-validation-summary="All"></div>
     <div>
