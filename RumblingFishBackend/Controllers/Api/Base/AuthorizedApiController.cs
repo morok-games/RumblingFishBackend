@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace RumblingFishBackend.Controllers.Base
+namespace RumblingFishBackend.Controllers.Api.Base
 {
     [Authorize]
     public abstract class AuthorizedApiController : ControllerBase

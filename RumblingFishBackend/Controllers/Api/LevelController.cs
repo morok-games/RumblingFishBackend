@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RumblingFishBackend.Controllers.Base;
+using RumblingFishBackend.Controllers.Api.Base;
 using RumblingFishBackend.Models.DTO.Level;
 using RumblingFishBackend.Services;
 
-namespace RumblingFishBackend.Controllers
+namespace RumblingFishBackend.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]

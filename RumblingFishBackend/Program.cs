@@ -42,7 +42,8 @@ builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddDbContext<GameDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers(); //Api only
+builder.Services.AddControllersWithViews();//MVC
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
