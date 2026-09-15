@@ -10,6 +10,7 @@ namespace RumblingFishBackend.Data
         {
         }
 
+        public DbSet<AdminAccount> AdminAccounts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<Level> Levels { get; set; }
@@ -18,6 +19,10 @@ namespace RumblingFishBackend.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AdminAccount>()
+                .HasIndex(x => x.Username)
+                .IsUnique();
+
             modelBuilder.Entity<User>()
                 .HasIndex(x => x.FirebaseUid)
                 .IsUnique();

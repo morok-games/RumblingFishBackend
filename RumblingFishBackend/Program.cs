@@ -1,9 +1,12 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RumblingFishBackend.Authentication;
 using RumblingFishBackend.Data;
+using RumblingFishBackend.Data.Seed;
+using RumblingFishBackend.Models;
 using RumblingFishBackend.Services;
 using Serilog;
 
@@ -16,6 +19,9 @@ builder.Host.UseSerilog((context, configuration) =>
         .WriteTo.Console()
         .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 14);
 });
+
+//Identity
+builder.Services.AddScoped<IPasswordHasher<AdminAccount>, PasswordHasher<AdminAccount>>();
 
 //Firebase
 var firebaseCredentialsPath = builder.Configuration["Firebase:CredentialsPath"];
@@ -62,5 +68,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+await AdminAccountSeed.SeedAsync(app);
 
 app.Run();
