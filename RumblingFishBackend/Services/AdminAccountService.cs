@@ -20,7 +20,7 @@ namespace RumblingFishBackend.Services
         {
             var account = await _db.AdminAccounts.FirstOrDefaultAsync(x => x.Username == username);
 
-            if (account == null)
+            if (account == null || password == null)
             {
                 return null;
             }
