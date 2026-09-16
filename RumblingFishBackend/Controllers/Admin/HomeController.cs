@@ -7,7 +7,9 @@ namespace RumblingFishBackend.Controllers.Admin
     [Route("admin/[controller]")]
     public class HomeController : AuthorizedAdminController
     {
-        // GET: HomeController
+        [HttpGet]
+        [Route("")]
+        [Route("/admin")]
         public ActionResult Index()
         {
             return View();
