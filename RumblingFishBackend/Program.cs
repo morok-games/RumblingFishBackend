@@ -9,6 +9,7 @@ using RumblingFishBackend.Data.Seed;
 using RumblingFishBackend.Models;
 using RumblingFishBackend.Services;
 using Serilog;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,18 @@ builder.Services
         options.AccessDeniedPath = "/admin/login";
     });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("login", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
+
 //Services custom
 builder.Services.AddScoped<AdminAccountService>();
 
@@ -74,6 +87,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

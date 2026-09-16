@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using RumblingFishBackend.Models.DTO.Login;
 using RumblingFishBackend.Services;
 using System.Security.Claims;
-using RumblingFishBackend.Models.DTO.Login;
 
 namespace RumblingFishBackend.Controllers.Admin
 {
@@ -32,6 +33,7 @@ namespace RumblingFishBackend.Controllers.Admin
         }
 
         [HttpPost]
+        [EnableRateLimiting("login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(LoginViewModel model, string? returnUrl)
         {
