@@ -21,6 +21,7 @@ namespace RumblingFishBackend.Services
 
             var totalPlayers = await query.CountAsync();
             var totalLevels = await _db.Levels.CountAsync();
+            page = page < 1 ? 1 : page;
 
             var rows = await query
                 .OrderByDescending(x => x.Score)
@@ -88,7 +89,7 @@ namespace RumblingFishBackend.Services
             return new PlayerDetailsViewModel(player.PlayerId, player.Nickname ?? string.Empty, player.CountryCode, countryName, player.Rank, player.Score, player.CreatedAt, levelStats);
         }
 
-        private IQueryable<PlayerStatistics> ApplyFilters(IQueryable<PlayerStatistics> query, PlayerListFilter filter)
+        private static IQueryable<PlayerStatistics> ApplyFilters(IQueryable<PlayerStatistics> query, PlayerListFilter filter)
         {
             if (!string.IsNullOrWhiteSpace(filter.CountryCode))
                 query = query.Where(x => x.Player.CountryCode == filter.CountryCode);
