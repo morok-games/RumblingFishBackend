@@ -9,7 +9,7 @@
 <body>
     <nav class="navbar navbar-dark bg-dark">
         <div class="container">
-            <span class="navbar-brand mb-0 h1">Rumbling Fish Admin</span>
+            <span class="navbar-brand mb-0 h1">Rumbling Fish Admin - @ViewData["Title"]</span>
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <form asp-controller="Login" asp-action="Logout" method="post" class="d-flex">

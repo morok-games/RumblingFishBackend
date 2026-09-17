@@ -83,7 +83,9 @@ namespace RumblingFishBackend.Services
                 .Select(pls => new PlayerLevel(pls.Level.Name, pls.Attempts, pls.Deaths, pls.Rating, pls.Completed, pls.PlayTime))
                 .ToListAsync();
 
-            return new PlayerDetailsViewModel(player.PlayerId, player.Nickname ?? string.Empty, player.CountryCode, player.Rank, player.Score, player.CreatedAt, levelStats);
+            var countryName = player.CountryCode != null ? GetCountryName(player.CountryCode) : null;
+
+            return new PlayerDetailsViewModel(player.PlayerId, player.Nickname ?? string.Empty, player.CountryCode, countryName, player.Rank, player.Score, player.CreatedAt, levelStats);
         }
 
         private IQueryable<PlayerStatistics> ApplyFilters(IQueryable<PlayerStatistics> query, PlayerListFilter filter)
