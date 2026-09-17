@@ -58,6 +58,7 @@ builder.Services.AddRateLimiter(options =>
 
 //Services custom
 builder.Services.AddScoped<AdminAccountService>();
+builder.Services.AddScoped<AdminPlayerService>();
 
 builder.Services.AddHttpClient<FirebaseSaveService>();
 builder.Services.AddHttpClient<GeoIpService>();
