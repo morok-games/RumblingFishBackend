@@ -73,6 +73,11 @@ builder.Services.AddDbContext<GameDbContext>(options =>
 //builder.Services.AddControllers(); //Api only
 builder.Services.AddControllersWithViews();//MVC
 
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+});
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

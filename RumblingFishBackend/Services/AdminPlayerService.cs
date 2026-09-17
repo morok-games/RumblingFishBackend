@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RumblingFishBackend.Data;
+using RumblingFishBackend.Models;
 using RumblingFishBackend.Models.DTO.Admin;
 using System.Globalization;
 
@@ -16,19 +17,7 @@ namespace RumblingFishBackend.Services
             
         public async Task<PlayerListViewModel> GetPlayersAsync(int page, int pageSize, PlayerListFilter filter)
         {
-            var query = _db.PlayerStatistics.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(filter.CountryCode))
-                query = query.Where(x => x.Player.CountryCode == filter.CountryCode);
-
-            if (!string.IsNullOrWhiteSpace(filter.Nickname))
-                query = query.Where(x => EF.Functions.ILike(x.Player.Nickname!, $"%{filter.Nickname}%"));
-
-            if (filter.DateFrom.HasValue)
-                query = query.Where(x => x.Player.User.CreatedAt >= filter.DateFrom.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
-
-            if (filter.DateTo.HasValue)
-                query = query.Where(x => x.Player.User.CreatedAt < filter.DateTo.Value.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
+            var query = ApplyFilters(_db.PlayerStatistics, filter);
 
             var totalPlayers = await query.CountAsync();
             var totalLevels = await _db.Levels.CountAsync();
@@ -66,7 +55,24 @@ namespace RumblingFishBackend.Services
             return new PlayerListViewModel(players, page, totalPages, pageSize, filter, availableCountries);
         }
 
-        public async Task<List<CountryOption>> GetAvailableCountriesAsync()
+        private IQueryable<PlayerStatistics> ApplyFilters(IQueryable<PlayerStatistics> query, PlayerListFilter filter)
+        {
+            if (!string.IsNullOrWhiteSpace(filter.CountryCode))
+                query = query.Where(x => x.Player.CountryCode == filter.CountryCode);
+
+            if (!string.IsNullOrWhiteSpace(filter.Nickname))
+                query = query.Where(x => EF.Functions.ILike(x.Player.Nickname!, $"%{filter.Nickname}%"));
+
+            if (filter.DateFrom.HasValue)
+                query = query.Where(x => x.Player.User.CreatedAt >= filter.DateFrom.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
+
+            if (filter.DateTo.HasValue)
+                query = query.Where(x => x.Player.User.CreatedAt < filter.DateTo.Value.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
+
+            return query;
+        }
+
+        private async Task<List<CountryOption>> GetAvailableCountriesAsync()
         {
             var codes = await _db.Players
                 .Where(x => x.CountryCode != null)

@@ -25,7 +25,7 @@ namespace RumblingFishBackend.Controllers.Admin
 
             if (result.Succeeded)
             {
-                return RedirectToAction("index", "home");
+                return RedirectToAction("index", "players");
             }
 
             ViewData["ReturnUrl"] = returnUrl;
@@ -56,7 +56,7 @@ namespace RumblingFishBackend.Controllers.Admin
                 return Redirect(returnUrl);
             }
 
-            return RedirectToAction("index", "home");
+            return RedirectToAction("index", "players");
         }
 
         [HttpPost("/admin/logout")]

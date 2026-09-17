@@ -6,13 +6,13 @@ using RumblingFishBackend.Services;
 namespace RumblingFishBackend.Controllers.Admin
 {
     [Route("admin/[controller]")]
-    public class HomeController : AuthorizedAdminController
+    public class PlayersController : AuthorizedAdminController
     {
         private const int DefaultPageSize = 10;
         private static readonly int[] AllowedPageSizes = { 10, 20, 50, 100 };
         private readonly AdminPlayerService _service;
 
-        public HomeController(AdminPlayerService service)
+        public PlayersController(AdminPlayerService service)
         {
             _service = service;
         }
