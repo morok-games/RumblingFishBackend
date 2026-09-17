@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RumblingFishBackend.Data;
 using RumblingFishBackend.Models.DTO.Admin;
+using System.Globalization;
 
 namespace RumblingFishBackend.Services
 {
@@ -60,8 +61,33 @@ namespace RumblingFishBackend.Services
                 .ToList();
 
             var totalPages = (int)Math.Ceiling(totalPlayers / (double)pageSize);
+            var availableCountries = await GetAvailableCountriesAsync();
 
-            return new PlayerListViewModel(players, page, totalPages, pageSize, filter);
-        }   
+            return new PlayerListViewModel(players, page, totalPages, pageSize, filter, availableCountries);
+        }
+
+        public async Task<List<CountryOption>> GetAvailableCountriesAsync()
+        {
+            var codes = await _db.Players
+                .Where(x => x.CountryCode != null)
+                .Select(x => x.CountryCode!)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+            return codes.Select(code => new CountryOption(code, GetCountryName(code))).ToList();
+        }
+
+        private static string GetCountryName(string code)
+        {
+            try
+            {
+                return new RegionInfo(code).EnglishName;
+            }
+            catch (ArgumentException)
+            {
+                return code; // на случай кода, который RegionInfo не распознаёт
+            }
+        }
     }
 }

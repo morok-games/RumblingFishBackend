@@ -30,7 +30,13 @@
     </div>
     <div>
         <label class="form-label">Country</label>
-        <input type="text" name="countryCode" class="form-control" value="@Model.Filter.CountryCode" maxlength="2" placeholder="US" />
+        <select name="countryCode" class="form-select">
+            <option value="">All countries</option>
+            @foreach (var country in Model.AvailableCountries)
+            {
+                <option value="@country.Code" selected="@(country.Code == Model.Filter.CountryCode ? "selected" : null)">@country.Name (@country.Code)</option>
+            }
+        </select>
     </div>
     <div>
         <label class="form-label">Nickname contains</label>
