@@ -54,7 +54,7 @@ namespace RumblingFishBackend.Services
             var totalPages = (int)Math.Ceiling(totalPlayers / (double)pageSize);
             var availableCountries = await GetAvailableCountriesAsync();
 
-            return new PlayerListViewModel(players, page, totalPages, pageSize, filter, availableCountries);
+            return new PlayerListViewModel(players, page, totalPages, pageSize, filter, availableCountries, totalPlayers);
         }
 
         public async Task<PlayerDetailsViewModel?> GetPlayerDetailsAsync(int playerId)

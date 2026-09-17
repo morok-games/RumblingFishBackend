@@ -1,6 +1,6 @@
 ﻿namespace RumblingFishBackend.Models.DTO.Admin
 {
-    public record PlayerListViewModel(List<PlayerListRow> Players, int CurrentPage, int TotalPages, int PageSize, PlayerListFilter Filter, List<CountryOption> AvailableCountries);
+    public record PlayerListViewModel(List<PlayerListRow> Players, int CurrentPage, int TotalPages, int PageSize, PlayerListFilter Filter, List<CountryOption> AvailableCountries, int TotalPlayers);
 
     public record PlayerListRow(int PlayerId, int Rank, string? CountryCode, string Nickname, int CompletedLevels, int TotalLevels, DateTime CreatedAt, int Score);
 

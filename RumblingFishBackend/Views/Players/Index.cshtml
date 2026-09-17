@@ -16,8 +16,6 @@
     };
 }
 
-<h1>Players</h1>
-
 <form method="get" class="d-flex align-items-end gap-2 flex-wrap mb-3">
     <div>
         <label class="form-label">Rows per page</label>
@@ -93,6 +91,17 @@
     </tbody>
 </table>
 <div class="d-flex justify-content-between align-items-center mb-3">
+    @if (Model.TotalPlayers == 0)
+    {
+        <span class="text-muted">No players found</span>
+    }
+    else
+    {
+        var start = (Model.CurrentPage - 1) * Model.PageSize + 1;
+        var end = start + Model.Players.Count - 1;
+        <span class="text-muted">Showing @start–@end of @Model.TotalPlayers</span>
+    }
+
     <nav>
         <ul class="pagination">
             <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
