@@ -33,5 +33,22 @@ namespace RumblingFishBackend.Controllers.Admin
             var model = await _service.GetPlayersAsync(page, pageSize, filter);
             return View(model);
         }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> Details(int id, string? returnUrl)
+        {
+            var model = await _service.GetPlayerDetailsAsync(id);
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["ReturnUrl"] = !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
+                ? returnUrl
+                : Url.Action("Index", "Players");
+
+            return View(model);
+        }
     }
 }

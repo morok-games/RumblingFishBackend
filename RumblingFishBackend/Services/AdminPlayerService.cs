@@ -29,6 +29,7 @@ namespace RumblingFishBackend.Services
                 .Take(pageSize)
                 .Select(x => new
                 {
+                    x.PlayerId,
                     x.Player.Nickname,
                     x.Player.CountryCode,
                     x.Player.User.CreatedAt,
@@ -40,6 +41,7 @@ namespace RumblingFishBackend.Services
 
             var players = rows
                 .Select(row => new PlayerListRow(
+                    PlayerId: row.PlayerId,
                     Rank: row.Rank,
                     CountryCode: row.CountryCode,
                     Nickname: row.Nickname ?? string.Empty,
@@ -53,6 +55,35 @@ namespace RumblingFishBackend.Services
             var availableCountries = await GetAvailableCountriesAsync();
 
             return new PlayerListViewModel(players, page, totalPages, pageSize, filter, availableCountries);
+        }
+
+        public async Task<PlayerDetailsViewModel?> GetPlayerDetailsAsync(int playerId)
+        {
+            var player = await _db.PlayerStatistics
+                .Where(x => x.PlayerId == playerId)
+                .Select(x => new
+                {
+                    x.PlayerId,
+                    x.Player.Nickname,
+                    x.Player.CountryCode,
+                    x.Player.User.CreatedAt,
+                    x.Score,
+                    Rank = 1 + _db.PlayerStatistics.Count(p => p.Score > x.Score || (p.Score == x.Score && p.PlayerId < x.PlayerId))
+                })
+                .FirstOrDefaultAsync();
+
+            if (player == null)
+            {
+                return null;
+            }
+
+            var levelStats = await _db.PlayerLevelStatistics
+                .Where(pls => pls.PlayerId == playerId)
+                .OrderBy(pls => pls.Level.Name)
+                .Select(pls => new PlayerLevel(pls.Level.Name, pls.Attempts, pls.Deaths, pls.Rating, pls.Completed, pls.PlayTime))
+                .ToListAsync();
+
+            return new PlayerDetailsViewModel(player.PlayerId, player.Nickname ?? string.Empty, player.CountryCode, player.Rank, player.Score, player.CreatedAt, levelStats);
         }
 
         private IQueryable<PlayerStatistics> ApplyFilters(IQueryable<PlayerStatistics> query, PlayerListFilter filter)

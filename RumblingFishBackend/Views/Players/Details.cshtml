@@ -1,0 +1,57 @@
+﻿@model RumblingFishBackend.Models.DTO.Admin.PlayerDetailsViewModel
+@{
+    ViewData["Title"] = "Player details";
+}
+
+<h1>@Model.Nickname</h1>
+
+<dl class="row">
+    <dt class="col-sm-2">Rank</dt>
+    <dd class="col-sm-10">@Model.Rank</dd>
+
+    <dt class="col-sm-2">Country</dt>
+    <dd class="col-sm-10">
+        @if (!string.IsNullOrEmpty(Model.CountryCode))
+        {
+            <img src="https://flagcdn.com/24x18/@(Model.CountryCode.ToLower()).png" alt="@Model.CountryCode" />
+            @Model.CountryCode
+        }
+    </dd>
+
+    <dt class="col-sm-2">Score</dt>
+    <dd class="col-sm-10">@Model.Score</dd>
+
+    <dt class="col-sm-2">Created (UTC)</dt>
+    <dd class="col-sm-10">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+</dl>
+
+@if (Model.LevelStats.Count != 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Level</th>
+                <th>Attempts</th>
+                <th>Deaths</th>
+                <th>Rating</th>
+                <th>Completed</th>
+                <th>Play Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var level in Model.LevelStats)
+            {
+                <tr>
+                    <td>@level.LevelName</td>
+                    <td>@level.Attempts</td>
+                    <td>@level.Deaths</td>
+                    <td>@level.Rating</td>
+                    <td>@(level.Completed ? "Yes" : "No")</td>
+                    <td>@level.PlayTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a href="@ViewData["ReturnUrl"]" class="btn btn-outline-secondary">Back to list</a>
